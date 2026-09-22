@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "roc_desk_http"
 version = "0.1.0"
 edition = "2021"
@@ -8,7 +8,8 @@ default = []
 host-adapter = []
 
 [dependencies]
-roc_desk_core = { git = "https://github.com/swimhigh/roc_desk-common", package = "roc_desk_core", tag = "core-v0.1.0" }`r`nroc_desk_common = { git = "https://github.com/swimhigh/roc_desk-common", package = "roc_desk_common", tag = "common-v0.2.1" }
+roc_desk_core = { git = "https://github.com/swimhigh/roc_desk-common", package = "roc_desk_core", tag = "common-v0.2.2" }
+roc_desk_common = { git = "https://github.com/swimhigh/roc_desk-common", package = "roc_desk_common", tag = "common-v0.2.1" }
 async-trait = "0.1"
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
@@ -18,5 +19,6 @@ serde_json = "1"
 serde_yaml = "0.9"
 thiserror = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
+
 
 
