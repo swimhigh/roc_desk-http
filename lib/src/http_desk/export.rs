@@ -1,6 +1,8 @@
-//! 导出�?Postman Collection v2.1（docs/HTTP_DESKTOP_PLAN.md §4.7）——`import.rs`
-//! 的逆操作，字段映射基本是对称的（同一�?`AuthConfig`/`RequestBody` 变体互转）�?//! 没有�?OpenCollection YAML 导出，留作后续任务；HAR 格式只记�?已经发生过的
-//! 请求/响应"，不是给别的工具"导入成可编辑集合"用的格式，本来就不适合当导出目标�?
+//! 导出成 Postman Collection v2.1（docs/HTTP_DESKTOP_PLAN.md §4.7）——`import.rs`
+//! 的逆操作，字段映射基本是对称的（同一套 `AuthConfig`/`RequestBody` 变体互转）。
+//! 没有做 OpenCollection YAML 导出，留作后续任务；HAR 格式只记录"已经发生过的
+//! 请求/响应"，不是给别的工具"导入成可编辑集合"用的格式，本来就不适合当导出目标。
+
 use serde_json::{json, Value};
 
 use crate::error::AppError;
@@ -114,11 +116,12 @@ fn request_to_postman_item(req: &RequestDef) -> Value {
     json!({ "name": req.name, "request": request })
 }
 
-/// �?`folder`（相�?`requests/` 的路径分段）把扁平的请求列表重新组装�?Postman
+/// 按 `folder`（相对 `requests/` 的路径分段）把扁平的请求列表重新组装成 Postman
 /// `item` 数组该有的嵌套结构——用"按下一级目录名分组再递归"而不是一次性建一整棵
 /// 树结构，实现简单、集合规模（几十到几百个请求）下性能完全够用。按插入顺序分组
-/// （不�?HashMap），保证同一份集合每次导出的文件夹顺序稳定，不会因为哈希顺序
-/// 随机变化导致每次导出�?diff 全是无意义的顺序抖动�?fn build_items(entries: &[(Vec<String>, Value)]) -> Vec<Value> {
+/// （不用 HashMap），保证同一份集合每次导出的文件夹顺序稳定，不会因为哈希顺序
+/// 随机变化导致每次导出的 diff 全是无意义的顺序抖动。
+fn build_items(entries: &[(Vec<String>, Value)]) -> Vec<Value> {
     let mut out: Vec<Value> = entries
         .iter()
         .filter(|(folder, _)| folder.is_empty())
@@ -142,7 +145,9 @@ fn request_to_postman_item(req: &RequestDef) -> Value {
     out
 }
 
-/// 导出指定集合�?Postman Collection v2.1 JSON 字符串——调用方（`commands::http_desk`�?/// 拿到字符串后交给前端写盘，这一层不碰文件系统之外的东西（只读，不改集合本身）�?pub async fn to_postman_collection(
+/// 导出指定集合成 Postman Collection v2.1 JSON 字符串——调用方（`commands::http_desk`）
+/// 拿到字符串后交给前端写盘，这一层不碰文件系统之外的东西（只读，不改集合本身）。
+pub async fn to_postman_collection(
     file_ops: &dyn FileOps,
     workspace_root: &str,
     slug: &str,

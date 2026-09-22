@@ -217,7 +217,9 @@ pub struct HttpExecuteResult {
 #[derive(Debug, Clone, Serialize)]
 pub struct HttpRequestHistoryEntry {
     pub id: String,
-    pub workspace_id: String,
+    /// 本地 HTTP 集合根目录路径（不再是宿主的 `workspace_id: Uuid`——这个独立工具
+    /// 没有"已打开工作区注册表"的概念，直接用集合所在目录做标识）。
+    pub root: String,
     pub collection_slug: String,
     pub request_id: Option<String>,
     pub environment_id: Option<String>,
@@ -242,7 +244,7 @@ pub struct HttpRequestHistoryDetail {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HttpWorkspaceTab {
     pub id: String,
-    pub workspace_id: String,
+    pub root: String,
     pub collection_slug: String,
     pub request_id: String,
     pub title: String,
