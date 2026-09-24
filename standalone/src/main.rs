@@ -5,12 +5,17 @@ use tauri::Manager;
 fn main() {
     // The main window is declared once in tauri.conf.json.
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            let app_data_dir = app
-                .path()
-                .app_data_dir()
-                .expect("resolve app data dir");
-            std::fs::create_dir_all(&app_data_dir).expect("create app data dir");
+            // Portable, exe-relative `.rock_desk` dir (see
+            // `roc_desk_core::paths::portable_data_dir` docs) instead of
+            // Tauri's OS AppData default — keeps this standalone tool's data
+            // in the same place/layout the full `roc_desk.exe` host uses, so
+            // copying several standalone tool exes into one directory makes
+            // them share it automatically.
+            let app_data_dir =
+                roc_desk_core::paths::portable_data_dir().expect("resolve app data dir");
             let db_path = app_data_dir.join("roc_desk_http.db");
             let state = roc_desk_http::HttpAppState::new(&db_path).expect("initialize HTTP tool state");
             app.manage(state);
