@@ -7,13 +7,15 @@ import type {
   HttpExecuteResult,
   HttpRequestHistoryDetail,
   HttpRequestHistoryEntry,
+  HttpWorkspaceTab,
   RequestDef,
   RequestSummary,
-} from "./types";
+} from "../types/bindings";
 
-/** IPC 封装——所有 command 都用本地目录路径 `root` 标识"当前打开的 HTTP 集合根
- * 目录"，不再依赖宿主"已打开工作区注册表"的 `workspaceId`。 */
-export const api = {
+/** IPC 封装——对照 `lib/src/lib.rs` 里 `pub mod cmd` 实际的 28 个 `#[tauri::command]`
+ * 参数签名维护（这个仓库的后端用本地目录路径 `root` 代替宿主 `roc_desk` 的
+ * `workspace_id: Uuid`，因为这个独立工具没有"已打开工作区注册表"的概念）。 */
+export const httpDeskService = {
   listCollections(root: string): Promise<HttpCollectionSummary[]> {
     return invoke("http_list_collections", { root });
   },
@@ -56,7 +58,7 @@ export const api = {
     return invoke("http_save_environment", { root, slug, environment });
   },
   deleteEnvironment(root: string, slug: string, envId: string): Promise<void> {
-    return invoke("http_delete_environment", { root, slug, envId });
+    return invoke("http_delete_environment", { root, slug, envId: envId });
   },
   getGlobalVariables(root: string): Promise<EnvVar[]> {
     return invoke("http_get_global_variables", { root });
@@ -97,5 +99,15 @@ export const api = {
   },
   clearHistory(root: string): Promise<void> {
     return invoke("http_clear_history", { root });
+  },
+
+  listTabs(root: string): Promise<HttpWorkspaceTab[]> {
+    return invoke("http_list_tabs", { root });
+  },
+  openTab(root: string, slug: string, requestId: string, title: string): Promise<HttpWorkspaceTab> {
+    return invoke("http_open_tab", { root, slug, requestId, title });
+  },
+  closeTab(id: string): Promise<void> {
+    return invoke("http_close_tab", { id });
   },
 };

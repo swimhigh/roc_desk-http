@@ -1,3 +1,6 @@
+// IPC 类型绑定——手写对照 `lib/src/http_desk/model.rs` 和 `roc_desk_core::error::AppError`
+// （来自 roc_desk-common）维护，不是自动生成。改了 Rust 侧记得同步这里。
+
 export interface KeyValueItem {
   key: string;
   value: string;
@@ -98,6 +101,16 @@ export interface HttpRequestHistoryDetail {
   response_snapshot: string | null;
 }
 
+export interface HttpWorkspaceTab {
+  id: string;
+  root: string;
+  collection_slug: string;
+  request_id: string;
+  title: string;
+  sort_order: number;
+  updated_at: string;
+}
+
 export function newRequest(id: string, name: string): RequestDef {
   return {
     id,
@@ -109,4 +122,26 @@ export function newRequest(id: string, name: string): RequestDef {
     auth: { type: "none" },
     body: { type: "none" },
   };
+}
+
+/** 对应 `roc_desk_core::error::AppError`（`roc_desk-common` 仓库）——
+ * `#[serde(tag = "kind", content = "message")]`，Tauri `invoke()` 的 rejection
+ * 是这个裸对象，不是 JS `Error` 实例。 */
+export type AppErrorKind =
+  | "Connection"
+  | "Auth"
+  | "HostKeyRejected"
+  | "PermissionDenied"
+  | "NotFound"
+  | "Database"
+  | "Conflict"
+  | "Internal";
+
+export interface AppError {
+  kind: AppErrorKind;
+  message: string;
+}
+
+export function isAppError(e: unknown): e is AppError {
+  return typeof e === "object" && e !== null && "kind" in e && "message" in e;
 }
